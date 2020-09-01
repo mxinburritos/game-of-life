@@ -1,5 +1,4 @@
 import React, { Component, useState } from 'react';
-import { Menu, Button, Modal, Header, Icon } from 'semantic-ui-react';
 
 import styles from './Grid.css';
 import Node from './Node/Node';
@@ -38,87 +37,43 @@ class Grid extends Component {
     this.setState({ mouseIsPressed: false });
   }
 
-  handleClear() {
-    const grid = initializeGrid();
-    this.setState({ modalOpen: false });
-    this.setState({ grid });
-  }
-
   render() {
     const { grid, mouseIsPressed } = this.state;
     return (
-      <>
-        <div className='grid'>
-          {grid.map((row, rowIdx) => {
-            return (
-              <div key={rowIdx}>
-                {row.map((node, nodeIdx) => {
-                  const { row, col, isSelected } = node;
-                  return (
-                    <Node
-                      key={nodeIdx}
-                      col={col}
-                      isSelected={isSelected}
-                      mouseIsPressed={mouseIsPressed}
-                      onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                      onMouseEnter={(row, col) => {
-                        this.handleMouseEnter(row, col);
-                      }}
-                      onMouseUp={() => this.handleMouseUp()}
-                      row={row}
-                    ></Node>
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-        <Menu>
-          <Modal
-            basic
-            onClose={() => this.setState({ modalOpen: false })}
-            onOpen={() => this.setState({ modalOpen: true })}
-            open={this.state.modalOpen}
-            size='small'
-            trigger={<Button>Clear Cells</Button>}
-            centered={true}
-            className='modal'
-          >
-            <Header icon>
-              <Icon name='archive' />
-              Archive Old Messages
-            </Header>
-            <Modal.Content>
-              <p>
-                Your inbox is getting full, would you like us to enable
-                automatic archiving of old messages?
-              </p>
-            </Modal.Content>
-            <Modal.Actions>
-              <Button
-                basic
-                color='red'
-                inverted
-                onClick={() => this.setState({ modalOpen: false })}
-              >
-                <Icon name='remove' /> No
-              </Button>
-              <Button color='green' inverted onClick={() => this.handleClear()}>
-                <Icon name='checkmark' /> Yes
-              </Button>
-            </Modal.Actions>
-          </Modal>
-        </Menu>
-      </>
+      <div className='grid'>
+        {grid.map((row, rowIdx) => {
+          return (
+            <div key={rowIdx} className='row'>
+              {row.map((node, nodeIdx) => {
+                const { row, col, isSelected } = node;
+                return (
+                  <Node
+                    key={nodeIdx}
+                    col={col}
+                    isSelected={isSelected}
+                    mouseIsPressed={mouseIsPressed}
+                    onMouseDown={(row, col) => this.handleMouseDown(row, col)}
+                    onMouseEnter={(row, col) => {
+                      this.handleMouseEnter(row, col);
+                    }}
+                    onMouseUp={() => this.handleMouseUp()}
+                    row={row}
+                  ></Node>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
     );
   }
 }
 
 const initializeGrid = () => {
   const grid = [];
-  for (let row = 0; row < 20; row++) {
+  for (let row = 0; row < 30; row++) {
     const currRow = [];
-    for (let col = 0; col < 50; col++) {
+    for (let col = 0; col < 40; col++) {
       currRow.push(createNode(col, row));
     }
     grid.push(currRow);
