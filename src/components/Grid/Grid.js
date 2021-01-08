@@ -2,8 +2,10 @@ import React, { Component, useState } from 'react';
 
 import styles from './Grid.css';
 import Node from './Node/Node';
+import GameOfLife from '../../algorithms/GameOfLife';
+import { Button, Typography } from '@material-ui/core';
 
-const CELL_SIZE = 20;
+const CELL_SIZE = 50;
 const WIDTH = 800;
 const HEIGHT = 600;
 
@@ -14,11 +16,12 @@ class Grid extends Component {
       grid: [],
       mouseIsPressed: false,
       modalOpen: false,
+      play: false,
     };
   }
 
   componentDidMount() {
-    const grid = initializeGrid();
+    const grid = initializeGrid(20, 50);
     this.setState({ grid });
   }
 
@@ -37,10 +40,16 @@ class Grid extends Component {
     this.setState({ mouseIsPressed: false });
   }
 
+  next() {
+    const newGrid = GameOfLife(this.state.grid);
+    this.setState({grid: newGrid});
+  }
+
   render() {
     const { grid, mouseIsPressed } = this.state;
     return (
       <div className='grid'>
+        <Button>Next</Button>
         {grid.map((row, rowIdx) => {
           return (
             <div key={rowIdx} className='row'>
@@ -69,11 +78,11 @@ class Grid extends Component {
   }
 }
 
-const initializeGrid = () => {
+const initializeGrid = (i, j) => {
   const grid = [];
-  for (let row = 0; row < 30; row++) {
+  for (let row = 0; row < i; row++) {
     const currRow = [];
-    for (let col = 0; col < 40; col++) {
+    for (let col = 0; col < j; col++) {
       currRow.push(createNode(col, row));
     }
     grid.push(currRow);
