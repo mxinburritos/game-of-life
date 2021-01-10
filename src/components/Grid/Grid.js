@@ -21,7 +21,7 @@ class Grid extends Component {
   }
 
   componentDidMount() {
-    const grid = initializeGrid(20, 50);
+    const grid = initializeGrid(5, 5);
     this.setState({ grid });
   }
 
@@ -49,7 +49,7 @@ class Grid extends Component {
     const { grid, mouseIsPressed } = this.state;
     return (
       <div className='grid'>
-        <Button>Next</Button>
+        <Button onClick={() => {this.next()}}>Next</Button>
         {grid.map((row, rowIdx) => {
           return (
             <div key={rowIdx} className='row'>
