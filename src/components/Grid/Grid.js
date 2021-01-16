@@ -13,44 +13,51 @@ class Grid extends Component {
   constructor() {
     super();
     this.state = {
-      grid: [],
-      mouseIsPressed: false,
+      leftIsPressed: false,
+      rightIsPressed: false,
       modalOpen: false,
       play: false,
     };
   }
 
-  componentDidMount() {
-    const grid = initializeGrid(5, 5);
-    this.setState({ grid });
+  async handleMouseEnter(e, row, col) {
+    if (!this.state.leftIsPressed && !this.state.rightIsPressed) return;
+    if (this.state.leftIsPressed) {
+      const newGrid = this.props.getNewGridWithWallEnabled(this.props.grid, row, col);
+      this.props.handleGridChange({ grid: newGrid });
+    } else if (this.state.rightIsPressed) {
+      const newGrid = this.props.getNewGridWithWallDisabled(this.props.grid, row, col);
+      this.props.handleGridChange({ grid: newGrid });
+    }
   }
 
-  handleMouseEnter(row, col) {
-    if (!this.state.mouseIsPressed) return;
-    const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
-    this.setState({ grid: newGrid });
+  handleMouseDown(e, row, col) {
+    e.persist();
+    if (e.button === 0) {
+      const newGrid = this.props.getNewGridWithWallEnabled(this.props.grid, row, col);
+      this.setState({ grid: newGrid, leftIsPressed: true });
+    } else if (e.button === 2) {
+      const newGrid = this.props.getNewGridWithWallDisabled(this.props.grid, row, col);
+      this.setState({ grid: newGrid, rightIsPressed: true });
+    }
   }
 
-  handleMouseDown(row, col) {
-    const newGrid = getNewGridWithWallToggled(this.state.grid, row, col);
-    this.setState({ grid: newGrid, mouseIsPressed: true });
-  }
-
-  handleMouseUp() {
-    this.setState({ mouseIsPressed: false });
+  handleMouseUp(e) {
+    this.setState({ leftIsPressed: false });
+    this.setState({ rightIsPressed: false });
   }
 
   next() {
-    const newGrid = GameOfLife(this.state.grid);
-    this.setState({grid: newGrid});
+    const newGrid = GameOfLife(this.props.grid);
+    this.props.handleGridChange(newGrid);
   }
 
   render() {
-    const { grid, mouseIsPressed } = this.state;
     return (
-      <div className='grid'>
+      <div className='grid' onContextMenu={(e) => e.preventDefault()}>
         <Button onClick={() => {this.next()}}>Next</Button>
-        {grid.map((row, rowIdx) => {
+        {console.log(this.props.grid)}
+        {this.props.grid.map((row, rowIdx) => {
           return (
             <div key={rowIdx} className='row'>
               {row.map((node, nodeIdx) => {
@@ -60,10 +67,11 @@ class Grid extends Component {
                     key={nodeIdx}
                     col={col}
                     isSelected={isSelected}
-                    mouseIsPressed={mouseIsPressed}
-                    onMouseDown={(row, col) => this.handleMouseDown(row, col)}
-                    onMouseEnter={(row, col) => {
-                      this.handleMouseEnter(row, col);
+                    leftIsPressed={this.state.leftIsPressed}
+                    rightIsPressed={this.state.rightIsPressed}
+                    onMouseDown={(e, row, col) => this.handleMouseDown(e, row, col)}
+                    onMouseEnter={(e, row, col) => {
+                      this.handleMouseEnter(e, row, col);
                     }}
                     onMouseUp={() => this.handleMouseUp()}
                     row={row}
@@ -77,36 +85,5 @@ class Grid extends Component {
     );
   }
 }
-
-const initializeGrid = (i, j) => {
-  const grid = [];
-  for (let row = 0; row < i; row++) {
-    const currRow = [];
-    for (let col = 0; col < j; col++) {
-      currRow.push(createNode(col, row));
-    }
-    grid.push(currRow);
-  }
-  return grid;
-};
-
-const getNewGridWithWallToggled = (grid, row, col) => {
-  const newGrid = grid.slice();
-  const node = newGrid[row][col];
-  const newNode = {
-    ...node,
-    isSelected: !node.isSelected,
-  };
-  newGrid[row][col] = newNode;
-  return newGrid;
-};
-
-const createNode = (col, row) => {
-  return {
-    col,
-    row,
-    isSelected: false,
-  };
-};
 
 export default Grid;

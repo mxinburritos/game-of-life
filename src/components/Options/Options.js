@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
 import { Menu, Button, Modal, Header, Icon } from 'semantic-ui-react';
-import Grid from '../Grid/Grid';
 
-const Options = () => {
+import Node from '../Grid/Node/Node';
+import Grid from '../Grid/Grid'
+
+const Options = ({initializeGrid, handleGridChange, grid}) => {
     const [modalOpen, setModalOpen] = useState(false);
 
     const handleClear = () => {
-        this.setState({ modalOpen: false });
-        this.setState({ grid: Grid });
+        setModalOpen(false);
+        let newGrid = initializeGrid(grid.length, grid[0].length);
+        handleGridChange(newGrid);
     };
 
     return (
         <Menu>
             <Modal
                 basic
-                onClose={setModalOpen(false)}
-                onOpen={setModalOpen(true)}
+                onClose={() => setModalOpen(false) }
+                onOpen={() => setModalOpen(true) }
                 open={modalOpen}
                 size='small'
-                trigger={<Button>Clear Cells</Button>}
+                trigger={<Button>Clear cells</Button>}
                 centered={true}
                 className='modal'
             >
@@ -34,14 +37,15 @@ const Options = () => {
                         basic
                         color='red'
                         inverted
-                        onClick={setModalOpen(false)}
+                        onClick={() => { setModalOpen(false) }}
                     >
                         <Icon name='remove' /> No
                     </Button>
                     <Button
+                        basic
                         color='green'
                         inverted
-                        onClick={setModalOpen(false)}
+                        onClick={() => { handleClear(); setModalOpen(false) }}
                     >
                         <Icon name='checkmark' /> Yes
                     </Button>

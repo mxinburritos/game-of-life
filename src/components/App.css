@@ -1,3 +1,6 @@
 .container {
   white-space: nowrap;
+  align-items: center;
+  margin: 0 0;
+  width: 100%;
 }
