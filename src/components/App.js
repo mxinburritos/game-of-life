@@ -1,66 +1,54 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import 'semantic-ui-css/semantic.min.css';
 
 import './App.css';
-import Grid from './Grid/Grid';
-import Options from './Options/Options';
 
 const App = () => {
-  const [grid, setGrid] = useState(initializeGrid(30,50));
+  const HEIGHT = 50;
+  const WIDTH = 50;
+  const [grid, setGrid] = useState([]);
+  const [running, setRunning] = useState(false);
 
-  const handleGridChange = (newGrid) => {
-    setGrid(newGrid);
+  useEffect(() => {
+    generateGrid();
+  }, [])
+
+  useEffect(() => {
+    cycle();
+  })
+
+  const generateGrid = () => {
+    let grid = Array(HEIGHT).fill().map(() => Array(WIDTH).fill(0));
+    setGrid(grid);
+  }
+
+  const handleClick = (row, col) => {
+    let newGrid = grid;
+    newGrid[row][col] = grid[row][col] === 1 ? 0 : 1
+    setGrid([...newGrid]);
+  }
+
+  const cycle = () => {
+    if(!running) {
+      return;
+    }
+    let newGrid = grid;
+    newGrid[15][15] = grid[15][15] === 1 ? 0 : 1
+    setGrid([...newGrid]);
   }
 
   return (
     <div className='container'>
-      <h5>App</h5>
-      <Grid initializeGrid={initializeGrid} getNewGridWithWallDisabled={getNewGridWithWallDisabled} getNewGridWithWallEnabled={getNewGridWithWallEnabled} handleGridChange={handleGridChange} grid={grid}/>
-      <Options initializeGrid={initializeGrid} handleGridChange={handleGridChange} grid={grid}/>
+      <button onClick={() => {setRunning(!running)}}>{running ? "Stop" : "Start"}</button>
+      {grid.map((row, i) => {
+        return <div id={`${i}`} style={{display: 'flex', flexDirection: 'row'}}>
+        {row.map((col, j) => {
+          return <div onClick={() => {handleClick(i, j)}} id={`${i} ${j}`} style={{ backgroundColor: grid[i][j] === 1 ? 'pink' : 'white', width: '20px', height: '20px', outline: '1px solid black'}}></div>
+        })}
+        </div>
+      })}
     </div>
   );
-};
-
-const initializeGrid = (i, j) => {
-  const grid = [];
-  for (let row = 0; row < i; row++) {
-    const currRow = [];
-    for (let col = 0; col < j; col++) {
-      currRow.push(createNode(col, row));
-    }
-    grid.push(currRow);
-  }
-  return grid;
-};
-
-const getNewGridWithWallDisabled = (grid, row, col) => {
-  const newGrid = grid.slice();
-  const node = newGrid[row][col];
-  const newNode = {
-    ...node,
-    isSelected: false,
-  };
-  newGrid[row][col] = newNode;
-  return newGrid;
-};
-
-const getNewGridWithWallEnabled = (grid, row, col) => {
-  const newGrid = grid.slice();
-  const node = newGrid[row][col];
-  const newNode = {
-    ...node,
-    isSelected: true,
-  };
-  newGrid[row][col] = newNode;
-  return newGrid;
-};
-
-const createNode = (col, row) => {
-  return {
-    col,
-    row,
-    isSelected: false,
-  };
 };
 
 export default App;
